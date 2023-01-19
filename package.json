@@ -11,20 +11,20 @@
     "vpn",
     "tunnel"
   ],
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "https://github.com/novoseltcev/wireguard-wrapper.git",
   "author": "Novoseltcev Stanislav <novoseltcev.stanislav@gmail.com>",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -d",
     "lint": "eslint --fix --ext .ts,.tsx .",
     "lint:check": "eslint --ext .ts,.tsx .",
     "format": "prettier --write --plugin-search-dir=. \"**/*.{ts,tsx,md,json,cjs}\" --ignore-path .gitignore",
     "format:check": "prettier --check --plugin-search-dir=. \"**/*.{ts,tsx,md,json,cjs}\" --ignore-path .gitignore"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.12",
     "@commitlint/cli": "^17.4.2",
     "@commitlint/config-conventional": "^17.4.2",
     "autoprefixer": "^10.4.13",
@@ -33,5 +33,6 @@
     "eslint-config-prettier": "^8.6.0",
     "eslint-kit": "^6.11.0",
     "typescript": "^4.9.4"
-  }
+  },
+  "dependencies": {}
 }
