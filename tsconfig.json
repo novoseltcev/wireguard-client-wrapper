@@ -17,7 +17,7 @@
     "strictNullChecks": true,
     "esModuleInterop": true,
 
-    "outDir": "./dist",
+    "outDir": "./dist"
   },
   "include": ["./src"],
   "references": [{ "path": "./tsconfig.node.json" }],
