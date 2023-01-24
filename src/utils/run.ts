@@ -19,28 +19,26 @@ export class ExecError extends Error {
 export async function run(command: string, name: string, sudoPrompt = true) {
   return new Promise<ExecResponse>((resolve, reject) => {
     if (sudoPrompt) {
-      sudo.exec(
-        command,
-        { name },
-        (error?: Error, stdout?: string | Buffer, stderr?: string | Buffer) => {
-          if (!error) {
-            resolve({ stdout, stderr });
-          } else {
-            reject(new ExecError(error, stdout, stderr));
-          }
-        },
-      );
+      sudo.exec(command, { name }, execCallback(resolve, reject));
     } else {
-      child.exec(
-        command,
-        (error: child.ExecException | null, stdout: string, stderr: string) => {
-          if (!error) {
-            resolve({ stdout, stderr });
-          } else {
-            reject(new ExecError(error, stdout, stderr));
-          }
-        },
-      );
+      child.exec(command, execCallback(resolve, reject));
     }
   });
 }
+
+const execCallback = (
+  resolve: (value: ExecResponse | PromiseLike<ExecResponse>) => void,
+  reject: (reason?: ExecError) => void,
+) => {
+  return (
+    error?: Error | child.ExecException | null,
+    stdout?: string | Buffer,
+    stderr?: string | Buffer,
+  ) => {
+    if (!error) {
+      resolve({ stdout, stderr });
+    } else {
+      reject(new ExecError(error, stdout, stderr));
+    }
+  };
+};
