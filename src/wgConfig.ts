@@ -1,5 +1,5 @@
 export interface Interface {
-  address: string;
+  address: string[];
   listenPort?: number;
   privateKey: string;
   dns: string[];
@@ -13,7 +13,6 @@ export interface Peer {
 }
 
 export interface WgConfig {
-  name: string;
-  interface: Interface;
-  peer: Peer;
+  wgInterface: Interface;
+  wgPeer: Peer;
 }

@@ -6,9 +6,5 @@ module.exports = configure({
     presets.node(),
     presets.prettier(),
     presets.typescript(),
-    presets.react({
-      newJSXTransform: true,
-    }),
-    presets.effector(),
   ],
 });
