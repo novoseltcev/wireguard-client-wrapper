@@ -1,3 +1,6 @@
+import f from 'fs';
+const fs = f.promises;
+
 import { suite, test } from '@testdeck/mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -8,19 +11,33 @@ chai.should();
 const _ = chai.expect;
 
 @suite
-class LinuxStrategyTest {
+class StrategyTest {
   private platform: string;
+  private device: string;
   private strategy: WgStrategy;
 
   public before() {
     this.platform = process.platform;
-    this.strategy = getStrategy('test wg client');
-  }
+    this.device = 'wg-test';
+    const processName = 'test wg client';
 
-  @test
-  'Strategy valid for platforms'() {
-    expect(this.platform).to.be.equal('linux');
-    expect(this.strategy).to.be.instanceOf(WgLinuxStrategy);
+    switch (this.platform) {
+      case 'linux':
+        this.strategy = new WgLinuxStrategy(processName);
+        break;
+
+      // case 'darwin':
+      //   this.strategy = new WgMacStrategy(processName);
+      //   break;
+
+      // case 'win32':
+      //   this.strategy = new WgWindowsStrategy(processName);
+      //   break;
+
+      default:
+        throw new Error('Unsupported platform');
+    }
+    this.strategy = getStrategy('test wg client');
   }
 
   @test
@@ -30,7 +47,7 @@ class LinuxStrategyTest {
 
   @test
   async 'Check status'() {
-    expect(await this.strategy.status('wg0')).to.be.false;
+    expect(await this.strategy.status(this.device)).to.be.false;
   }
 
   @test
@@ -59,10 +76,12 @@ class LinuxStrategyTest {
 
   @test
   async 'Up and down'() {
-    const filePath = '/tmp/wg0.conf';
+    const tmpDir = this.platform == 'win32' ? 'C:\\Windows\\Temp\\' : '/tmp/';
+    const filePath = tmpDir + `${this.device}.conf`;
+    await fs.writeFile(filePath, '');
     await this.strategy.up(filePath);
-    expect(await this.strategy.status('wg0')).to.be.true;
+    expect(await this.strategy.status(this.device)).to.be.true;
     await this.strategy.down(filePath);
-    expect(await this.strategy.status('wg0')).to.be.false;
+    expect(await this.strategy.status(this.device)).to.be.false;
   }
 }
