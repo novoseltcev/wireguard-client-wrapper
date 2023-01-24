@@ -1,19 +1,21 @@
 import { run } from '../utils';
-import { WgConfig } from 'wgConfig';
 
-type WgResponse = {
+interface WgResponse {
   stdout?: string;
   stderr?: string;
 }
 
 export abstract class WgStrategy {
-  private processName: string
+  private processName: string;
 
   constructor(processName: string) {
     this.processName = processName;
   }
 
-  protected async exec(command: string, sudoPrompt = true): Promise<WgResponse> {
+  protected async exec(
+    command: string,
+    sudoPrompt = true,
+  ): Promise<WgResponse> {
     const result = await run(command, this.processName, sudoPrompt);
     if (result.stderr && Buffer.isBuffer(result.stderr)) {
       result.stderr = result.stderr.toString('utf-8');
@@ -29,10 +31,11 @@ export abstract class WgStrategy {
 
   abstract isInstalled(): Promise<boolean>;
 
-  abstract getActiveDevice(): Promise<string>;
+  abstract getActiveDevice(): Promise<string | null>;
   abstract up(filePath: string): Promise<void>;
   abstract down(filePath: string): Promise<void>;
   abstract status(device: string): Promise<boolean>;
 
+  abstract generatePrivateKey(): Promise<string>;
   abstract getPublicKey(config: string): Promise<string>;
 }

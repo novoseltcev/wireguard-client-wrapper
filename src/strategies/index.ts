@@ -1,2 +1,2 @@
-export * from './wgStrategy';
 export * from './wgLinuxStrategy';
+export * from './wgStrategy';

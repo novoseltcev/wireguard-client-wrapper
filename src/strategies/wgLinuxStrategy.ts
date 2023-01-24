@@ -1,5 +1,4 @@
 import { ExecError } from '../utils';
-
 import { WgStrategy } from './wgStrategy';
 
 export class WgLinuxStrategy extends WgStrategy {
@@ -16,61 +15,63 @@ export class WgLinuxStrategy extends WgStrategy {
       return false;
     } catch (error) {
       if (error instanceof ExecError) {
-        return String(error.stderr).includes('command not found') ? false : true;
+        return !String(error.stderr).includes('command not found');
       }
       throw error;
     }
   }
 
-  async getActiveDevice(): Promise<string> {
+  async getActiveDevice(): Promise<string | null> {
     try {
-      const {stderr, stdout} = await this.exec("wg show", false);
+      const { stderr, stdout } = await this.exec('wg show', false);
       if (stderr) {
         throw new Error(stderr);
       }
-    
+
       const lines = stdout!.split(/\n/);
-      const tunnelName = lines[0].split(" ")[1]?.replace(/(\r\n|\n|\r)/gm, "");
-    
-      return tunnelName;
-    } catch (e) {
-      if (e instanceof ExecError) {
-        if (!e.stderr) {
-          throw new Error(e.stderr);
+      return lines[0].split(' ')[1]?.replace(/(\r\n|\n|\r)/gm, '') || null;
+    } catch (error) {
+      if (error instanceof ExecError && error.stderr) {
+        const splittedText: string[] = String(error.stderr).split(':');
+
+        if (splittedText.length === 0) {
+          return '';
         }
-
-        const splittedText: string[] = String(e.stderr).split(":");
-
-        if (splittedText.length == 0) {
-          return "";
-        }
-
-        const indexOfName = splittedText[0].lastIndexOf(" ");
-        return splittedText[0].substring(indexOfName + 1, splittedText[0].length);
+        return splittedText[0].split(' ').slice(-1)[0];
       }
-      throw e;
+      throw error;
     }
   }
 
   async up(filePath: string): Promise<void> {
-    await this.exec(`wg-quick up ${filePath.replace(" ", "\\ ")}`);
+    await this.exec(`wg-quick up ${filePath.replace(' ', '\\ ')}`);
   }
 
-  async down(filePath: string): Promise<void> { 
-    await this.exec(`wg-quick down ${filePath.replace(" ", "\\ ")}`);
+  async down(filePath: string): Promise<void> {
+    await this.exec(`wg-quick down ${filePath.replace(' ', '\\ ')}`);
   }
 
   async status(device: string): Promise<boolean> {
-    const command = `wg show ${device}`;
-    const { stderr, stdout } = await this.exec(command);
-    if (stderr) {
-      throw new Error(String(stderr));
+    try {
+      const { stderr, stdout } = await this.exec(`wg show ${device}`);
+      if (stderr) {
+        throw new Error(String(stderr));
+      }
+      return Boolean(stdout!.match(/interface: (.*)/));
+    } catch (error) {
+      if (
+        error instanceof ExecError &&
+        error.stderr &&
+        String(error.stderr).includes('No such device')
+      ) {
+        return false;
+      }
+      throw error;
     }
-    return stdout!.match(/interface: (.*)/) ? true : false;
   }
 
   async generatePrivateKey(): Promise<string> {
-    const {stdout, stderr} = await this.exec('wg genkey', false);
+    const { stdout, stderr } = await this.exec('wg genkey', false);
     if (stderr) {
       throw new Error(stderr);
     }
