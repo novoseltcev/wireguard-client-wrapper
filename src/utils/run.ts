@@ -21,12 +21,8 @@ export async function run(command: string, name: string, sudoPrompt = true) {
     if (sudoPrompt) {
       sudo.exec(
         command,
-        { name, },
-        function (
-          error?: Error,
-          stdout?: string | Buffer,
-          stderr?: string | Buffer,
-        ) {
+        { name },
+        (error?: Error, stdout?: string | Buffer, stderr?: string | Buffer) => {
           if (!error) {
             resolve({ stdout, stderr });
           } else {
@@ -37,11 +33,7 @@ export async function run(command: string, name: string, sudoPrompt = true) {
     } else {
       child.exec(
         command,
-        function (
-          error: child.ExecException | null,
-          stdout: string,
-          stderr: string,
-        ) {
+        (error: child.ExecException | null, stdout: string, stderr: string) => {
           if (!error) {
             resolve({ stdout, stderr });
           } else {

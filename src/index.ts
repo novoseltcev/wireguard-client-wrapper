@@ -1,2 +1,2 @@
-export * from './wgConfig';
 export * from './client';
+export * from './wgConfig';

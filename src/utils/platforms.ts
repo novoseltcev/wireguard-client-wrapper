@@ -1,7 +1,7 @@
 import os from 'os';
 import {
-  WgStrategy,
   WgLinuxStrategy,
+  WgStrategy,
   // WgWindowsStrategy,
   // WgMacStrategy,
 } from '../strategies';
@@ -18,4 +18,3 @@ export function getStrategy(processName: string): WgStrategy {
       throw new Error('Unsupported OS');
   }
 }
-
