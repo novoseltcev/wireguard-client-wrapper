@@ -1,0 +1,24 @@
+.github
+.nyc_output
+node_modules
+
+src
+test
+.editorconfig
+.eslintignore
+.eslintrc.cjs
+.gitignore
+.mocharc.json
+.nyrc.json
+.prettierrc.cjs
+commitlint.config.cjs
+LICENSE
+register.js
+tsconfig.json
+tsconfig.node.json
+tsconfig.eslint.json
+yarn.lock
+
+# build
+package
+*.tgz
