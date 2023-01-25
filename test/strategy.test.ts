@@ -4,12 +4,12 @@ const fs = f.promises;
 import { suite, test } from '@testdeck/mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
-import { 
-  WgLinuxStrategy, 
+import {
+  WgLinuxStrategy,
   WgStrategy,
   WgMacStrategy,
   WgWindowsStrategy,
- } from '../src/strategies';
+} from '../src/strategies';
 
 chai.should();
 const _ = chai.expect;
@@ -40,7 +40,7 @@ class StrategyTest {
 
       default:
         throw new Error('Unsupported platform');
-    }    
+    }
   }
 
   @test
@@ -81,7 +81,7 @@ class StrategyTest {
   async 'Up and down'() {
     const tmpDir = this.platform == 'win32' ? 'C:\\Windows\\Temp\\' : '/tmp/';
     const filePath = tmpDir + `${this.device}.conf`;
-    if (!await f.existsSync(filePath)) {
+    if (!(await f.existsSync(filePath))) {
       await fs.writeFile(filePath, '');
     }
     await this.strategy.up(filePath);
