@@ -3,19 +3,29 @@ import { WgStrategy } from './wgStrategy';
 
 export class WgWindowsStrategy extends WgStrategy {
   async isInstalled(): Promise<boolean> {
-    const wgCommand = 'wg --version';
-    const wgQuickCommand = 'wg-quick --version';
-    const { stderr } = await this.exec(wgCommand, false);
-    if (stderr) {
-      return false;
+    try {
+      await this.exec('wg --version', false);
+    } catch (error) {
+      if (error instanceof ExecError) {
+        return false;
+      }
+      throw error;
     }
 
     try {
-      await this.exec(wgQuickCommand, false);
+      await this.exec('wireguard --version', false);
       return false;
     } catch (error) {
       if (error instanceof ExecError) {
-        return !String(error.stderr).includes('command not found');
+        if (
+          String(error.stderr).includes('не является внутренней или внешней')
+        ) {
+          return false;
+        }
+        if (String(error.stderr).includes('is not recognized as an internal')) {
+          return false;
+        }
+        return true;
       }
       throw error;
     }
@@ -68,8 +78,7 @@ export class WgWindowsStrategy extends WgStrategy {
     } catch (error) {
       if (
         error instanceof ExecError &&
-        error.stderr &&
-        String(error.stderr).includes('No such device')
+        String(error.error).includes('No such file or directory')
       ) {
         return false;
       }
