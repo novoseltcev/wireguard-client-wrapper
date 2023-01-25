@@ -4,8 +4,12 @@ const fs = f.promises;
 import { suite, test } from '@testdeck/mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
-import { WgLinuxStrategy, WgStrategy } from '../src/strategies';
-import { getStrategy } from '../src/utils';
+import {
+  WgLinuxStrategy,
+  WgStrategy,
+  WgMacStrategy,
+  WgWindowsStrategy,
+} from '../src/strategies';
 
 chai.should();
 const _ = chai.expect;
@@ -26,18 +30,17 @@ class StrategyTest {
         this.strategy = new WgLinuxStrategy(processName);
         break;
 
-      // case 'darwin':
-      //   this.strategy = new WgMacStrategy(processName);
-      //   break;
+      case 'darwin':
+        this.strategy = new WgMacStrategy(processName);
+        break;
 
-      // case 'win32':
-      //   this.strategy = new WgWindowsStrategy(processName);
-      //   break;
+      case 'win32':
+        this.strategy = new WgWindowsStrategy(processName);
+        break;
 
       default:
         throw new Error('Unsupported platform');
     }
-    this.strategy = getStrategy('test wg client');
   }
 
   @test
@@ -78,9 +81,12 @@ class StrategyTest {
   async 'Up and down'() {
     const tmpDir = this.platform == 'win32' ? 'C:\\Windows\\Temp\\' : '/tmp/';
     const filePath = tmpDir + `${this.device}.conf`;
-    await fs.writeFile(filePath, '');
+    if (!(await f.existsSync(filePath))) {
+      await fs.writeFile(filePath, '');
+    }
     await this.strategy.up(filePath);
     expect(await this.strategy.status(this.device)).to.be.true;
+    expect(await this.strategy.getActiveDevice()).to.be.equal(this.device);
     await this.strategy.down(filePath);
     expect(await this.strategy.status(this.device)).to.be.false;
   }
