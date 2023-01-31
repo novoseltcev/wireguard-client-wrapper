@@ -54,7 +54,7 @@ export class WgWindowsStrategy extends WgStrategy {
   }
 
   async up(filePath: string): Promise<void> {
-    await this.exec(`wireguard /installtunnelservice ${filePath}`);
+    await this.exec(`wireguard /installtunnelservice "${filePath}"`);
   }
 
   async down(filePath: string): Promise<void> {

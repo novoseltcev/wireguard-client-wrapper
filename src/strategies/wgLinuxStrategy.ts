@@ -3,15 +3,13 @@ import { WgStrategy } from './wgStrategy';
 
 export class WgLinuxStrategy extends WgStrategy {
   async isInstalled(): Promise<boolean> {
-    const wgCommand = 'wg --version';
-    const wgQuickCommand = 'wg-quick --version';
-    const { stderr } = await this.exec(wgCommand, false);
+    const { stderr } = await this.exec('wg --version', false);
     if (stderr) {
       return false;
     }
 
     try {
-      await this.exec(wgQuickCommand, false);
+      await this.exec('wg-quick --version', false);
       return false;
     } catch (error) {
       if (error instanceof ExecError) {
