@@ -9,7 +9,7 @@ import {
   WgStrategy,
   WgMacStrategy,
   WgWindowsStrategy,
-} from '../src/strategies';
+} from '../dist/strategies';
 
 chai.should();
 const _ = chai.expect;

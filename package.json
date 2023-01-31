@@ -19,7 +19,7 @@
   "private": false,
   "scripts": {
     "build": "tsc -d",
-    "test": "nyc ./node_modules/.bin/_mocha 'test/**/*.test.ts' --timeout 20000",
+    "test": "tsc -d  && nyc ./node_modules/.bin/_mocha 'test/**/*.test.ts' --timeout 20000",
     "lint": "eslint --fix --ext .ts,.tsx .",
     "lint:check": "eslint --ext .ts,.tsx .",
     "format": "prettier --write --plugin-search-dir=. \"**/*.{ts,tsx,md,json,cjs}\" --ignore-path .gitignore",
