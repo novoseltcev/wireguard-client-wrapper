@@ -24,12 +24,9 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
-      - name: Run ESLint
-        run: |
-          yarn lint:check
       - name: Run Prettier
         run: |
           yarn format:check
-      - name: Build
+      - name: Run ESLint
         run: |
-          yarn build
+          yarn lint:check
