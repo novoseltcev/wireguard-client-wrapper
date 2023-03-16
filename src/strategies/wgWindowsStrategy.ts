@@ -1,10 +1,10 @@
 import { ExecError } from '../utils';
-import { WgStrategy } from './wgStrategy';
+import { WgStrategy, WgResponse } from './wgStrategy';
 
 export class WgWindowsStrategy extends WgStrategy {
   async isInstalled(): Promise<boolean> {
     try {
-      await this.exec('"C:\\Program Files\\Wireguard\\wg.exe" --version', false);
+      await this.exec('wg --version', false);
     } catch (error) {
       if (error instanceof ExecError) {
         return false;
@@ -13,7 +13,7 @@ export class WgWindowsStrategy extends WgStrategy {
     }
 
     try {
-      await this.exec('"C:\\Program Files\\Wireguard\\wireguard.exe" --version', false);
+      await this.exec('wireguard --version', false);
       return false;
     } catch (error) {
       if (error instanceof ExecError) {
@@ -33,7 +33,7 @@ export class WgWindowsStrategy extends WgStrategy {
 
   async getActiveDevice(): Promise<string | null> {
     try {
-      const { stderr, stdout } = await this.exec('"C:\\Program Files\\Wireguard\\wg.exe" show', false);
+      const { stderr, stdout } = await this.exec('wg show', false);
       if (stderr) {
         throw new Error(stderr);
       }
@@ -54,12 +54,12 @@ export class WgWindowsStrategy extends WgStrategy {
   }
 
   async up(filePath: string): Promise<void> {
-    await this.exec(`"C:\\Program Files\\Wireguard\\wireguard.exe" /installtunnelservice "${filePath}"`);
+    await this.exec(`wireguard /installtunnelservice "${filePath}"`);
   }
 
   async down(filePath: string): Promise<void> {
     await this.exec(
-      `"C:\\Program Files\\Wireguard\\wireguard.exe" /uninstalltunnelservice ${this.getNameFromPath(filePath)}`,
+      `wireguard /uninstalltunnelservice ${this.getNameFromPath(filePath)}`,
     );
   }
 
@@ -70,7 +70,7 @@ export class WgWindowsStrategy extends WgStrategy {
 
   async status(device: string): Promise<boolean> {
     try {
-      const { stderr, stdout } = await this.exec(`"C:\\Program Files\\Wireguard\\wg.exe" show ${device}`);
+      const { stderr, stdout } = await this.exec(`wg show ${device}`);
       if (stderr) {
         throw new Error(String(stderr));
       }
@@ -87,7 +87,7 @@ export class WgWindowsStrategy extends WgStrategy {
   }
 
   async generatePrivateKey(): Promise<string> {
-    const { stdout, stderr } = await this.exec('"C:\\Program Files\\Wireguard\\wg.exe" genkey', false);
+    const { stdout, stderr } = await this.exec('wg genkey', false);
     if (stderr) {
       throw new Error(stderr);
     }
@@ -95,11 +95,21 @@ export class WgWindowsStrategy extends WgStrategy {
   }
 
   async getPublicKey(privateKey: string): Promise<string> {
-    const command = `echo ${privateKey} | "C:\\Program Files\\Wireguard\\wg.exe" pubkey`;
+    const command = `echo ${privateKey} | wg pubkey`;
     const { stdout, stderr } = await this.exec(command, false);
     if (stderr) {
       throw new Error(stderr);
     }
     return stdout!.trim();
+  }
+
+  async exec(
+    command: string,
+    sudoPrompt = true,
+  ): Promise<WgResponse> {
+    return super.exec(
+      `set PATH=%PATH%;"%ProgramFiles%\\Wireguard" & ${command}`, 
+      sudoPrompt,
+    );
   }
 }

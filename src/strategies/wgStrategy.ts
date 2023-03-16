@@ -1,6 +1,6 @@
 import { run } from '../utils';
 
-interface WgResponse {
+export interface WgResponse {
   stdout?: string;
   stderr?: string;
 }
