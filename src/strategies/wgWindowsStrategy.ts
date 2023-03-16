@@ -33,7 +33,7 @@ export class WgWindowsStrategy extends WgStrategy {
 
   async getActiveDevice(): Promise<string | null> {
     try {
-      const { stderr, stdout } = await this.exec('wg show', false);
+      const { stderr, stdout } = await this.exec('"C:\\Program Files\\Wireguard\\wg.exe" show', false);
       if (stderr) {
         throw new Error(stderr);
       }
@@ -54,12 +54,12 @@ export class WgWindowsStrategy extends WgStrategy {
   }
 
   async up(filePath: string): Promise<void> {
-    await this.exec(`wireguard /installtunnelservice "${filePath}"`);
+    await this.exec(`"C:\\Program Files\\Wireguard\\wireguard.exe" /installtunnelservice "${filePath}"`);
   }
 
   async down(filePath: string): Promise<void> {
     await this.exec(
-      `wireguard /uninstalltunnelservice ${this.getNameFromPath(filePath)}`,
+      `"C:\\Program Files\\Wireguard\\wireguard.exe" /uninstalltunnelservice ${this.getNameFromPath(filePath)}`,
     );
   }
 
@@ -70,7 +70,7 @@ export class WgWindowsStrategy extends WgStrategy {
 
   async status(device: string): Promise<boolean> {
     try {
-      const { stderr, stdout } = await this.exec(`wg show ${device}`);
+      const { stderr, stdout } = await this.exec(`"C:\\Program Files\\Wireguard\\wg.exe" show ${device}`);
       if (stderr) {
         throw new Error(String(stderr));
       }
@@ -87,7 +87,7 @@ export class WgWindowsStrategy extends WgStrategy {
   }
 
   async generatePrivateKey(): Promise<string> {
-    const { stdout, stderr } = await this.exec('wg genkey', false);
+    const { stdout, stderr } = await this.exec('"C:\\Program Files\\Wireguard\\wg.exe" genkey', false);
     if (stderr) {
       throw new Error(stderr);
     }
@@ -95,7 +95,7 @@ export class WgWindowsStrategy extends WgStrategy {
   }
 
   async getPublicKey(privateKey: string): Promise<string> {
-    const command = `echo ${privateKey} | wg pubkey`;
+    const command = `echo ${privateKey} | "C:\\Program Files\\Wireguard\\wg.exe" pubkey`;
     const { stdout, stderr } = await this.exec(command, false);
     if (stderr) {
       throw new Error(stderr);
