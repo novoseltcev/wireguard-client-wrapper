@@ -4,7 +4,7 @@ import { WgStrategy } from './wgStrategy';
 export class WgWindowsStrategy extends WgStrategy {
   async isInstalled(): Promise<boolean> {
     try {
-      await this.exec('wg --version', false);
+      await this.exec('"C:\\Program Files\\Wireguard\\wg.exe" --version', false);
     } catch (error) {
       if (error instanceof ExecError) {
         return false;
@@ -13,7 +13,7 @@ export class WgWindowsStrategy extends WgStrategy {
     }
 
     try {
-      await this.exec('wireguard --version', false);
+      await this.exec('"C:\\Program Files\\Wireguard\\wireguard.exe" --version', false);
       return false;
     } catch (error) {
       if (error instanceof ExecError) {
