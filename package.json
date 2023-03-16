@@ -1,6 +1,6 @@
 {
   "name": "wireguard-client-wrapper",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Crossplatform wrapper for wireguard client",
   "keywords": [
     "wireguard",
